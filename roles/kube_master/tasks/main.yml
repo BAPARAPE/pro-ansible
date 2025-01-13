@@ -1,0 +1,11 @@
+--- 
+- name: Initializing Kubernetes Cluster for master 
+  command: kubeadm init --pod-network-cicdr=10.244.0.0/16  
+  when: inventory_hostname == 'nodeM'   
+
+- name: Copying kubeconfig files 
+  copy:  
+    src: /etc/kubernetes/admin.conf  
+    dest: ~/.kube/config 
+    remoote_src: yes   
+  when: inventory_hostname == 'nodeM'

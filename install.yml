@@ -1,0 +1,28 @@
+--- 
+- name: Setup Kubernetes Cluster 
+  hosts: all 
+  become: yes 
+  vars_files: 
+    - vault/nodeM_password.yml 
+    - vault/node1_password.yml 
+    - vault/node2_password.yml 
+  roles: 
+    - common 
+
+- name: Setup Kubernetes Master 
+  hosts: kubernetes_master 
+  become: yes
+  vars_files: 
+  
+    - vault/nodeM_password.yml
+  roles: 
+    - kube_master
+
+- name: Setup Kubernetes Workers 
+  hosts: kubernetes_workers 
+  become: yes 
+  vars_files:  
+    - vault/node1_password.yml
+    - vault/node2_password.yml
+  roles: 
+    - kube_worker 

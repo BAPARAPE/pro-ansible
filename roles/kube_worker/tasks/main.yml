@@ -1,0 +1,5 @@
+--- 
+- name: Join worker to kubernetes cluster  
+  command: "{{ hostvars['master']['kubeadm_join_command'] }}"
+  when: inventory_hostname != 'nodeM'  
+  
