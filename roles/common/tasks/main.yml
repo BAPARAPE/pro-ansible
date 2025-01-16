@@ -1,4 +1,3 @@
----
 - name: Update apt and install dependencies 
   apt:
     update_cache: yes 
@@ -23,12 +22,21 @@
     state: started 
   become: yes 
 
-- name: Add Kubernetes apt repository 
-  apt_repository: 
-    repo: 'deb https://apt.kubernetes.io/ kubernetes-xenial main' 
-    state: present 
-    filename: "kubernetes"  
+- name: Télécharger la clé GPG de Kubernetes
+  shell: |
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/k8s.gpg
+  args:
+    creates: /etc/apt/keyrings/k8s.gpg
+  become: yes
 
+- name: Ajouter le dépôt Kubernetes
+  shell: |
+    echo 'deb [signed-by=/etc/apt/keyrings/k8s.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /' > /etc/apt/sources.list.d/k8s.list
+  args:
+    creates: /etc/apt/sources.list.d/k8s.list
+  become: yes
+  
 - name: Install kubeadm, kubelet, kubectl 
   apt: 
     name: 

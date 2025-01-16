@@ -1,0 +1,9 @@
+--- 
+
+- hosts: kubernetes_workers 
+  become: yes 
+  vars_files: 
+    - vault/password1.yml
+    - vault/password2.yml
+  roles: 
+    - kube_worker  

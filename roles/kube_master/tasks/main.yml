@@ -1,11 +1,28 @@
---- 
-- name: Initializing Kubernetes Cluster for master 
-  command: kubeadm init --pod-network-cicdr=10.244.0.0/16  
-  when: inventory_hostname == 'nodeM'   
+- name: Initializing Kubernetes Cluster with kubeadm 
+  command: kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=NumCPU
+  register: init_output
+  ignore_errors: yes  
 
-- name: Copying kubeconfig files 
-  copy:  
-    src: /etc/kubernetes/admin.conf  
-    dest: ~/.kube/config 
-    remoote_src: yes   
-  when: inventory_hostname == 'nodeM'
+- name:   Create kubeconfig files annd copy kubeconfig file in user directory
+  shell: |
+    mkdir -p $HOME/.kube 
+    sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config 
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  become: yes  
+  when: init_output.rc == 0 
+
+# - name: Apply network Calico 
+#   shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml --insecure-skip-tls-verify
+#   become: yes
+#   when: init_output.rc == 0 
+
+- name: Generate workers token
+  command: kubeadm token create --print-join-command 
+  register: join_command 
+  delegate_to: nodeM
+  when: init_output.rc == 0
+
+- name: Print join command for workers
+  debug: 
+    msg: "Exécutez cette commande sur les nodes workers: {{ join_command.stdout }}"
+  when: init_output.rc == 0          

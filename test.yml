@@ -1,0 +1,16 @@
+--- 
+- hosts: all 
+  become: yes 
+  vars_files: 
+    - vault/passwordM.yml 
+    - vault/password1.yml 
+    - vault/password2.yml 
+  tasks:  
+    - name: Supprimer le fichier sources erroné de kubernetes 
+      file: 
+        path: /etc/apt/sources.list.d/k8s.list
+        state: absent 
+    - name: Supprimer le fichier k8s 
+      file: 
+        path: /etc/apt/keyrings/k8s.gpg
+        state: absent     

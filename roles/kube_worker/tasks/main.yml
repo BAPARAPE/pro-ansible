@@ -1,5 +1,4 @@
---- 
-- name: Join worker to kubernetes cluster  
-  command: "{{ hostvars['master']['kubeadm_join_command'] }}"
-  when: inventory_hostname != 'nodeM'  
-  
+- name: Joining kubernetes cluster 
+  command: kubeadm join 192.168.1.73:6443 --token h5msp4.67mj5prnxb1cx5z9 --discovery-token-ca-cert-hash sha256:677a35b5686b39108a27abbe95e908b1f2534111e2673ad6352ce973dd02fded
+  become: yes
+
